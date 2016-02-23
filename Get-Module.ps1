@@ -12,6 +12,7 @@ break
 
 function Load-PowerCLI
 {
+    #pls download and install module first
     Add-PSSnapin VMware.VimAutomation.Core
    # Add-PSSnapin VMware.VimAutomation.Vds
    # Add-PSSnapin VMware.VumAutomation
