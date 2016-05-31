@@ -24,7 +24,10 @@ Load-PowerCLI
 
 
 Connect-VIServer sydvcs2012
-get-VM | select version,Name, powerstate, numcpu, Memorygb, @{N="IP Address";E={@($_.guest.IPAddress[0])}},@{n="OS";e={$_.guest.osfullname}},notes, @{n="NIC";e={$_.guest.networkadpters}} | sort "IP Address" | ft Export-Csv C:\temp\vsphere.csv
+
+
+
+, @{n="NIC";e={$_.guest.networkadpters}} | sort "IP Address" | ft Export-Csv C:\temp\vsphere.csv
 
 get-vm | Get-HardDisk -vm {$_.Name} | select capacitygb, filename, name, parent | sort parent, name | Export-Csv C:\temp\disk.csv
 
@@ -43,3 +46,10 @@ Import-PSSession $session
 
 #Delete  Calendar
 #Search-Mailbox -Identity "mcrabtree" -SearchQuery {subject:"weekly wip - telstra,DDB,Code"} -DeleteContent
+
+
+get-mailbox cking
+
+Search-Mailbox -Identity "cking" -SearchQuery {subject:"FW: Weekly NBN Marketing Review"} -DeleteContent
+
+FW: Weekly NBN Marketing Review

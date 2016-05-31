@@ -44,7 +44,7 @@ $obj=New-Object -TypeName psobject -property $pp
 $result=@()
 
 
-
+write-host "The Function Name is"$MyInvocation.MyCommand.Name -ForegroundColor Cyan
 
 foreach ($b in $ComputerNames){
 
@@ -69,7 +69,7 @@ else
 {
 $objtemp.status="Error"
 }
-
+Write-Debug "debug"
 
 $objtemp.'Uptime(Days)'=($os.LocalDateTime-$os.LastBootUpTime).Days
 
@@ -104,5 +104,5 @@ $result+=$objtemp
 $result | sort Status | ft
 }
 
-$names=get-adcomputer -Filter {operatingsystem -like "*2012*"} 
-Get-Uptime -ComputerNames $names.name
+#$names=get-adcomputer localhost
+Get-Uptime -ComputerNames localhost

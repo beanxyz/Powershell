@@ -103,3 +103,9 @@ default{
 
 }
 }
+
+
+   Invoke-Command -ComputerName sydit01 -ScriptBlock {
+
+    Start-Process -FilePath msiexec.exe -ArgumentList "/i c:\temp\NSCP-0.4.4.15-x64.msi.msi /q" -Wait -PassThru
+    }
