@@ -31,3 +31,5 @@ catch
 }
 }
 
+Test-Proxy -server sydtmg01
+

@@ -30,8 +30,7 @@ function Get-DeliveryInfo
         
         [string]
         $user,
-        [string]$path="c:\u
-        sers\yli\Documents\出库记录\xlsx\*.xlsx",
+        [string]$path="c:\users\yli\Documents\records\xlsx\*.xlsx",
         [string]$address="*"
      )
 

@@ -1,13 +1,23 @@
-﻿$a=import-csv -header name, title, mobile, ipphone C:\Users\yli\Downloads\name1.csv 
+﻿#$a=import-csv -header name, title, mobile, ipphone C:\Users\yli\Downloads\name1.csv 
+
+$a=import-csv C:\temp\list.csv
+
 foreach ($b in $a )
 {
 
-$c=$b.Name
+
+$c=$b.UserName
 $d=$b.Mobile
 
+
+
 if ($d){
-get-aduser -filter {name -like $c} -Properties name,mobile | Set-ADUser -Replace @{mobile=$d}
-get-aduser -Filter {name -like $c} -Properties name,mobile,ipphone | select Name, Mobile, @{name="Extension";expression={$_.ipphone}}
+
+set-aduser $c -MobilePhone $d -ErrorVariable ee
+#get-aduser $c -Properties name,mobile | foreach {Set-ADUser $_ -Replace @{mobile=$d} -WhatIf}
+get-aduser $c -Properties name,mobile,ipphone | select Name, Mobile, @{name="Extension";expression={$_.ipphone}}
 }
 
 }
+
+

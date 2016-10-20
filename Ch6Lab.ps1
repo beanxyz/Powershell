@@ -1,5 +1,6 @@
 ﻿#LabA
-
+$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$here
 function Get-ComputerInfo {
 <#
 .Synopsis
@@ -229,7 +230,7 @@ end {}
 }
 
 
-Get-SystemInfo -ComputerName "localhost"
+#Get-SystemInfo -ComputerName "localhost"
 
 
 function Get-DetailedInfo{
@@ -250,3 +251,9 @@ $obj
 }
 
 }
+
+
+#Get-DetailedInfo -ComputerNames sydwsus | select -ExpandProperty disksinfo
+#Get-DetailedInfo -ComputerNames sydwsus | Format-Custom *
+#Get-DetailedInfo -ComputerNames sydwsus | foreach{$_.disksInfo}
+#(Get-DetailedInfo -ComputerNames sydwsus).disksinfo
