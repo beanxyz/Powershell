@@ -35,14 +35,13 @@ break;
 $s| Remove-PSSession
 break;
 
-$cred = Get-Credential "yli@syd.ddb.com"
-Import-Module MSOnline
-Set-ExecutionPolicy remotesigned
-Connect-MsolService -Credential $cred
- 
-#连接到Office365
-$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell/ -Credential $Cred -Authentication Basic -AllowRedirection
-Import-PSSession $session
+
+
+$UserCredential = Get-Credential 
+
+Connect-MsolService -Credential $UserCredential
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
+Import-PSSession $Session
 
 #Delete  Calendar
 #Search-Mailbox -Identity "mcrabtree" -SearchQuery {subject:"weekly wip - telstra,DDB,Code"} -DeleteContent
@@ -53,3 +52,5 @@ get-mailbox cking
 Search-Mailbox -Identity "cking" -SearchQuery {subject:"FW: Weekly NBN Marketing Review"} -DeleteContent
 
 FW: Weekly NBN Marketing Review
+
+Remove-PSSession $Session

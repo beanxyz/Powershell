@@ -53,4 +53,4 @@ $s | Group-Object pscomputername
 
 }
 
-Get-software -software "firefox"  -verbose
+#Get-software -software "skype"  -verbose
