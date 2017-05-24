@@ -4,13 +4,15 @@ $names=get-adcomputer -Filter{operatingsystem -like "*20*"} | select -ExpandProp
 $results=get-pendingreboot -computername $names -ErrorAction Stop | select computer, rebootpending, pendfilerenval | sort rebootpending
 $results
 
+
 foreach ($c in $results){
 if ($c.RebootPending -eq "True")#
 {
    
  "Restarting server: "+$c.computer
-#Restart-Computer $c.Computer -Force
+ Restart-Computer $c.Computer -Force
 
 }
 
 }
+

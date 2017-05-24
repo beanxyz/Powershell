@@ -54,3 +54,6 @@ Search-Mailbox -Identity "cking" -SearchQuery {subject:"FW: Weekly NBN Marketing
 FW: Weekly NBN Marketing Review
 
 Remove-PSSession $Session
+
+
+Set-MsolUserPrincipalName -UserPrincipalName jbroadrick@syd.ddb.com -NewUserPrincipalName justin.broadrick@syd.ddb.com
