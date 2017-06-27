@@ -18,6 +18,9 @@ $err.TargetObject
 
 $err.TargetObject | measure
 
-#$b=$a | Where-Object {$_.'.Net 3 Installed' -eq 'No'}
+#$b=$a | Where-Object {($_.'.Net 3 Installed' -eq 'No')  }
 
-#Invoke-Command -ComputerName $b.PSComputerName -ScriptBlock {Install-WindowsFeature  -Name Net-Framework-Core -Source \\sydav01\SophosUpdate\tightvnc\sxs}
+
+
+
+#Invoke-Command -ComputerName $b.PSComputerName -ScriptBlock {  dism /online /enable-feature /featurename:netFx3 /all /source:\\sydav01\SophosUpdate\tightvnc\2012\sxs /LimitAccess}

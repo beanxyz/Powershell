@@ -6,7 +6,7 @@ function Get-Software{
 
 param(
 [parameter(mandatory=$true,position=1)][string]$software,
-[string]$computername="*",
+
 [string]$OS='*'
 )
 
@@ -14,7 +14,7 @@ param(
 Write-Verbose "Scanning Computers..."
 
 if($computername -ne '*'){
-$a=Get-ADComputer -Filter "name -like '*$computername*' " -Properties operatingsystem,ipv4address  | Where-Object{$_.ipv4address -ne $null} | select -ExpandProperty name
+$a=Get-ADComputer -Filter "operatingsystem -like '*$os*' " -Properties operatingsystem,ipv4address  | Where-Object{$_.ipv4address -ne $null} | select -ExpandProperty name
 }else
 {
 
