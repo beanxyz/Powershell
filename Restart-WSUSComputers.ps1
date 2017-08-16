@@ -10,7 +10,7 @@ if ($c.RebootPending -eq "True")#
 {
    
  "Restarting server: "+$c.computer
- #Restart-Computer $c.Computer -Force
+ Restart-Computer $c.Computer -Force
 
 }
 

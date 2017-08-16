@@ -1,18 +1,23 @@
-﻿#导入AD模块
-Import-Module ActiveDirectory
+﻿$Sessions=Get-PSSession
 
-#连接Office365
+#Import AD Module
 
-$Sessions=Get-PSSession
+Import-Module activedirectory
 
-if ($Sessions.ComputerName -like "outlook.office365.com"){
+#Import Office 365 Module
 
-    write-host "Detecting Office365 session, skip.." -ForegroundColor Cyan
+
+
+if (($Sessions.ComputerName -like "outlook.office365.com") -and ($Sessions.State -ne "Broken")){
+
+    write-host "Detecting current Office365 session, skip.." -ForegroundColor Cyan
 
 }
 else{
     
-    write-host "Starting Office365 session" -ForegroundColor Cyan
+    $Sessions | Remove-PSSession
+
+    write-host "Starting new Office365 session" -ForegroundColor Cyan
     $UserCredential = Get-Credential 
     Connect-MsolService -Credential $UserCredential
     $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
@@ -21,10 +26,8 @@ else{
 
 
 
-#获取AD对象
 
-
-#获取主地址
+#Get Primary SMTP Address
 function Get-PrimarySMTP(){
 
     [CmdletBinding()]
@@ -65,14 +68,17 @@ function Get-PrimarySMTP(){
     return $result 
 }
 
-#获取用户信息
+#Get AD User Informtion
 
 #$ADUsers = Get-ADUser -SearchBase "ou=mango,ou=ddb_group,ou=melbourne,dc=omnicom,dc=com,dc=au" -Properties proxyaddresses, emailaddress, displayname -Filter *
+Write-Host " "
 
-$ADUsers=get-aduser amellington -Properties proxyaddresses, emailaddress, displayname
+#$uName=Read-Host "Please input User AD name" 
+
+$ADUsers=get-aduser gwilson -Properties proxyaddresses, emailaddress, displayname
 
 
-#修改SamAccountName和UPN
+#Change SamAccountName and UPN
 foreach ($ADUser in $ADUsers) {
     $ADUser.Name
 	$GivenName = $ADUser.GivenName
@@ -88,11 +94,11 @@ foreach ($ADUser in $ADUsers) {
         write-host "Updating ADUPN: $oldupn -> $newUPN" -ForegroundColor Cyan
         
 
-        #更改AD UPN和SamAccount
+        #Change AD UPN and SamAccount
 		Set-ADUser $ADUser -SamAccountName $newSAM -UserPrincipalName $newUPN 
        
         
-        #更改email
+        #Change AD email
         $oldEmail=$ADUser.emailaddress
 
         $newEmail=$newSAM+‘@'+$oldemail.split('@')[1]
@@ -101,7 +107,7 @@ foreach ($ADUser in $ADUsers) {
 
         set-aduser $newSAM -EmailAddress $newEmail
 
-        #更改,替换 Primary SMTP
+        #Change Primary SMTP
 
         $primary=Get-PrimarySMTP -users $ADUser.name | select -ExpandProperty primarysmtp
 
@@ -119,7 +125,7 @@ foreach ($ADUser in $ADUsers) {
         
         
 
-        #更改cloud UPN
+        #Change cloud UPN. If Office365 session is not connected properly, follow commands wont' work!
 
         $oldmsolupn=Get-MsolUser -SearchString $ADUser.Name 
         $oldmsolupn=$oldmsolupn| select -First 1 | select -ExpandProperty UserPrincipalName
@@ -129,7 +135,6 @@ foreach ($ADUser in $ADUsers) {
         write-host "Updating MSOLUPN: $oldmsolupn -> $newmsolupn" -ForegroundColor Cyan
         Set-MsolUserPrincipalName -UserPrincipalName $oldmsolupn -NewUserPrincipalName $newmsolupn 
 		
-		#Write-Host "Changes to the user $($GivenName) $($SurName) were made!"
         Write-Host ""
 	}
     else{
@@ -138,10 +143,13 @@ foreach ($ADUser in $ADUsers) {
     }
 }
 
-#Confirm 
+#Confirm result 
 
-get-aduser $newSAM -Properties proxyaddresses
-Get-MsolUser -SearchString $ADUser.Name 
+Write-Host "Confirm AD Result " -ForegroundColor Cyan
+get-aduser $newSAM -Properties proxyaddresses,mail | select Name, SamAccountName, UserPrincipalName, proxyaddresses, mail
+
+Write-Host "Confirm O365 Result" -ForegroundColor Cyan
+Get-MsolUser -SearchString $ADUser.Name | select UserPrincipalName
 
 
 

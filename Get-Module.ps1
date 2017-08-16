@@ -50,10 +50,19 @@ Import-PSSession $Session
 get-mailbox cking
 
 Search-Mailbox -Identity "cking" -SearchQuery {subject:"FW: Weekly NBN Marketing Review"} -DeleteContent
+Search-Mailbox -Identity "lstromnes" -SearchQuery {subject:"Catch up: Mervyn & Leif"} -DeleteContent
+Search-Mailbox -Identity "lstromnes" -SearchQuery {subject:"Catch up: Mervyn & Leif"} -DeleteContent
 
-FW: Weekly NBN Marketing Review
+#FW: Weekly NBN Marketing Review
 
 Remove-PSSession $Session
 
 
 Set-MsolUserPrincipalName -UserPrincipalName jbroadrick@syd.ddb.com -NewUserPrincipalName justin.broadrick@syd.ddb.com
+
+
+#With 2FA authentication enabled already.  If you don't have this enabled, use the above section on line 6 and DISABLE the next 3 lines below by putting a # at the beginning of each line.
+
+Import-Module $((Get-ChildItem -Path $($env:LOCALAPPDATA+"\Apps\2.0\") -Filter Microsoft.Exchange.Management.ExoPowershellModule.dll -Recurse ).FullName|?{$_ -notmatch "_none_"}|select -First 1)
+$EXOSession = New-ExoPSSession
+Import-PSSession $EXOSession
