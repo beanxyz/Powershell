@@ -1,0 +1,3 @@
+﻿get-aduser -filter {(enabled -eq $true)} -Properties mobile, accountexpirationdate, mail, ipphone,PasswordNeverExpires | 
+select givenname, surname, mail, @{n='UserCategory';e={$temp=$_.accountexpirationdate; $temp2=$_.PasswordNeverExpires;if($temp2 -eq $true){"Service"}elseif($temp -eq $null){"Employee"}else{"Freelancer"};}}, userprincipalname, samaccountname, extensionattribute14, accountexpirationdate, mobile, ipphone |
+Out-GridView | export-csv C:\temp\users.csv 
