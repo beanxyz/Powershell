@@ -5,7 +5,7 @@ $eventcritea = @{logname='security';id=4740}
 
 $Events =get-winevent -ComputerName (Get-ADDomain).pdcemulator -FilterHashtable $eventcritea 
 
-#$Events = Get-WinEvent -ComputerName syddc01 -Filterxml $xmlfilter        
+#$Events = Get-WinEvent -ComputerName syddc01 -FilterHashtable $eventcritea     
 
 
             
