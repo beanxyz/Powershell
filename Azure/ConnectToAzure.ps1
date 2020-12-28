@@ -1,0 +1,4 @@
+﻿$user = geoff.rose@vet.partners
+$pass = "01000000d08c9ddf0115d1118c7a00c04fc297eb010000006c02469ee3855847add508583ae4194e0000000002000000000003660000c000000010000000cdea9e0b11e170e20310446e579fd9c40000000004800000a0000000100000005cd7fbe04d4670d4e90bf4a680020b4a180000005f4175e384afdc98b1f42d5144fd202c23a4526090dc727e14000000fd2fc07c944b9328bc4ab4af64a2a4e1c3b01cea"
+$credential =  New-Object -TypeName System.Management.Automation.PSCredential -argumentlist $username,($password | ConvertTo-SecureString)
+Connect-AzureAD -Credential $credential

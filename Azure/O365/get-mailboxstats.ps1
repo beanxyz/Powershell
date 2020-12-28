@@ -1,0 +1,1 @@
+﻿Get-Mailbox | Get-MailboxFolderStatistics | Where {$_.Name -match “Sent Items”} | Select Identity, Name, ItemsInFolder | Export-csv c:\scripts\SentItemCount.csv

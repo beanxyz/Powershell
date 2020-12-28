@@ -1,0 +1,1 @@
+﻿invoke-command -ComputerName au-svr-av-01.on.vetpartners.com.au -ScriptBlock {C:\Users\Administrator.VET\desktop\AD_Sync_Now.ps1}

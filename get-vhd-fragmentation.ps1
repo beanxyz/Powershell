@@ -1,0 +1,1 @@
+﻿get-vm "AU-SVR-DB-01” | Get-VMHardDiskDrive | get-vhd | Select path, FragmentationPercentage
