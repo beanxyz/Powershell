@@ -1,39 +1,21 @@
-﻿$result=@()
-$users=get-aduser -Filter {proxyaddresses -like "*rapp.com.au*"} -Properties proxyaddresses -SearchBase "ou=rapp,ou=ddb_group,ou=melbourne,dc=omnicom,dc=com,dc=au"
-foreach( $user in $users){
+﻿if($session.ComputerName -like "outlook.office365*"){
+    Write-Host "Outlook.Office365.com session is connected" -ForegroundColor Cyan
+}
+else{
+    #MFA Authentication#
+    #Import-Module $((Get-ChildItem -Path $($env:LOCALAPPDATA+"\Apps\2.0\") -Filter Microsoft.Exchange.Management.ExoPowershellModule.dll -Recurse ).FullName|?{$_ -notmatch "_none_"}|select -First 1)
+    #$EXOSession = New-ExoPSSession
+    #Import-PSSession $EXOSession
 
-foreach ($address in $user.proxyAddresses)
-{
-   if($address -like "*@rapp.com.au*"){
-   
-   $rappaddress=$address.Substring(5)
-   break;
+    #
 
-   
 
-   }
-   
+    $UserCredential = Get-Credential
+    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
+    Import-PSSession $Session
+    Connect-MsolService
 
 }
-
-$temp=[pscustomobject]@{"Full Name"=$user.Name;"Current Email"=$rappaddress}
-
-$result+=$temp
-
-}
-
-#$result
-
-$a=import-csv C:\temp\newuserList.csv | select "Full Name", "Current Email"
-
-
-$oo=$result+$a
-
-
-
-
-
-
 
 
 function Get-PrimarySMTP(){
@@ -76,71 +58,69 @@ $result+=$objtemp
 $result 
 }
 
-$users=$oo | sort "full Name"|select -ExpandProperty "Full Name"
-#$users=get-aduser yli |select -ExpandProperty name
 
-#write-host "Current Info" -ForegroundColor Red
+$users=Get-ADUser -SearchBase "OU=2.029 Eastside Veterinary Botany Rd,OU=VetPartners,DC=on,DC=vetpartners,DC=com,DC=au" -filter {proxyaddresses -like "*"} | select -ExpandProperty name
 
-#$users=import-csv C:\temp\newuserList.csv | select -ExpandProperty "Full Name"
+$users=Get-PrimarySMTP -users $users | Where-Object {$_.primarysmtp -like "*sydneyvetspecialists.com.au*"} | select -first 6
 
-#Get-PrimarySMTP -users $users
+$result=@()
 
 foreach($user in $users){
 
-$info=get-aduser -Filter {name -eq $user} -Properties proxyaddresses
+    $name=$user.primarysmtp.split('@')[0]
+    $name
+    $newaddress=$name+"@sves.com.au"
+
+    $temp=[pscustomobject]@{"oldaddress"=$user.primarysmtp; "newaddress"=$newaddress; "name"=$user.name}
+    $result+=$temp
+}
+
+$result
+
+Write-Output ""
+
+foreach($one in $result){
 
 
-$filter="smtp:"+$info.GivenName+"."+$info.Surname+"@track-au.com"
+    $newproxyaddress=@("SMTP:"+$one.newaddress;'smtp:'+$one.oldaddress)
+  
+    $oldaddress=$one.oldaddress.Trim()
+    $name=$one.name
 
-$new=@()
+    $sam=get-aduser -filter { name -eq $name} | select -ExpandProperty SamAccountName
+    
+    Write-Host "Updating AD Proxyaddresses and Mail"
+
+    set-aduser $sam -Replace @{proxyaddresses=$newproxyaddress}
+
+    set-aduser $sam -EmailAddress $one.newaddress
+
+    $upn=$one.newaddress
+
+    Set-ADUser -Identity $dn -Replace @{userprincipalname=$upn}
+
+   
+
+ 
 
 
-foreach($address in $info.proxyaddresses){
+    $oldmsolupn=Get-MsolUser -SearchString $oldaddress
+    $oldmsolupn=$oldmsolupn| select -First 1 | select -ExpandProperty UserPrincipalName
 
-$temp=$address
+    $newmsolupn=$one.newaddress
 
+    write-host "Updating MSOLUPN: $oldmsolupn -> $newmsolupn" -ForegroundColor Cyan
+    Set-MsolUserPrincipalName -UserPrincipalName $oldmsolupn -NewUserPrincipalName $newmsolupn 
 
-if($address -clike "SMTP*"){
-
-$temp=$address.ToLower()
+      
 
 
 }
 
-if($address -like $filter){
 
-$temp=$address.Substring(0,4).toupper()+$address.Substring(4).tolower()
-}
+Start-ADSyncSyncCycle -PolicyType Delta
 
 
 
-$new+=$temp
-
-}
-
-
-write-host "---------------------------" -ForegroundColor Cyan  
-
-
-$new
-
-set-aduser $info.SamAccountName -Replace @{proxyaddresses=$new} -whatif
-
-}
-
-
-repadmin /syncall syddc01 dc=omnicom,dc=com,dc=au /d /e /a 
-
-#write-host "New Primary SMTP Address" -ForegroundColor Cyan
-
-
-#$users=gc C:\temp\name.txt
-
-Get-PrimarySMTP -users $users
-
-$users | get-mailbox | select name, primarysmtpaddress 
-
-
-#$users=import-csv C:\temp\newuserList.csv | select -ExpandProperty "Full Name"
-
+#get-aduser $sam -Properties mail, proxyaddresses | select name, mail, proxyaddresses
 
