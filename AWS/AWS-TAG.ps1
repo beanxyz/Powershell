@@ -8,8 +8,8 @@ $all=Get-EC2Instance | select -expand instances
 $return=$all | Where-Object {$_.tag.key -notcontains "Clinic"}
 
 if($return -ne $null){
-$username = "frank@vet.partners" 
-$password = "Vetp5000" | ConvertTo-SecureString -asPlainText -Force
+$username = "frank@v.com" 
+$password = "Vet0" | ConvertTo-SecureString -asPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential($username,$password)
 $id=$return.InstanceId
 
